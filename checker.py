@@ -10,7 +10,7 @@ from selenium.webdriver.chrome.options import Options
 # ============================================================
 # CHANGE THIS to set your alert threshold (SGD)
 # ============================================================
-THRESHOLD = 2_000_000
+THRESHOLD = 4_000_000
 # ============================================================
 
 def get_jackpot():
