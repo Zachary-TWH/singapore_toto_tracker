@@ -1,25 +1,40 @@
-import requests
-from bs4 import BeautifulSoup
-import smtplib
-from email.mime.text import MIMEText
 import os
 import sys
+import smtplib
+from email.mime.text import MIMEText
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 # ============================================================
-# CHANGE THIS VALUE to set your alert threshold (in SGD)
+# CHANGE THIS to set your alert threshold (SGD)
 # ============================================================
-THRESHOLD = 1_000_000  # notify me when jackpot >= $1,000,000
+THRESHOLD = 2_000_000
 # ============================================================
 
 def get_jackpot():
-    url = "https://www.singaporepools.com.sg/en/product/pages/toto_results.aspx"
-    res = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
-    res.raise_for_status()
-    soup = BeautifulSoup(res.text, "html.parser")
-    jackpot = soup.select_one(".jackpotAmt").text.strip()
-    # Clean "$1,000,000" → 1000000
-    cleaned = jackpot.replace("$", "").replace(",", "").strip()
-    return int(cleaned), jackpot
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+
+    driver = webdriver.Chrome(options=options)
+    try:
+        driver.get("https://www.singaporepools.com.sg/en/product/pages/toto_results.aspx")
+        wait = WebDriverWait(driver, 20)
+        # Wait for jackpot amount to appear
+        element = wait.until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".jackpot-amount, .jackpotAmt, [class*='jackpot']"))
+        )
+        text = element.text.strip()
+        cleaned = text.replace("$", "").replace(",", "").replace("est", "").strip()
+        return int(cleaned), text
+    finally:
+        driver.quit()
 
 def send_email(jackpot_display):
     msg = MIMEText(f"TOTO Jackpot is now {jackpot_display} — time to buy a ticket!")
@@ -43,4 +58,4 @@ try:
 
 except Exception as e:
     print(f"Error: {e}")
-    sys.exit(1)  # exit code 1 triggers retry in GitHub Actions
+    sys.exit(1)
