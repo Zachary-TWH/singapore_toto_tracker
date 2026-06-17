@@ -1,4 +1,5 @@
 import sys
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -15,9 +16,16 @@ options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple
 driver = webdriver.Chrome(options=options)
 try:
     driver.get("https://www.singaporepools.com.sg/en/product/pages/toto_results.aspx")
-    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
     
-    # Print full page HTML so we can find the exact jackpot element
-    print(driver.page_source[:10000])
+    # Wait for JS to fully render the page
+    time.sleep(10)
+    
+    # Search for anything containing "2,500" or "Jackpot"
+    elements = driver.find_elements(By.XPATH, "//*[contains(text(), '2,500') or contains(text(), 'Jackpot') or contains(text(), 'jackpot')]")
+    for el in elements:
+        print("TAG:", el.tag_name)
+        print("CLASS:", el.get_attribute("class"))
+        print("TEXT:", repr(el.text[:200]))
+        print("---")
 finally:
     driver.quit()
