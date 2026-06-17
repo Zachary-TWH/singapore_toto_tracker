@@ -2,10 +2,8 @@ name: TOTO Jackpot Checker
 
 on:
   schedule:
-    - cron: "0 1 * * *"   # 9am SGT (main run)
-    - cron: "0 7 * * *"   # 3pm SGT (retry 1, +6h)
-    - cron: "0 13 * * *"  # 9pm SGT (retry 2, +12h)
-  workflow_dispatch:       # lets you trigger manually anytime
+    - cron: "0 5 * * *"   # 1pm SGT (UTC+8, so 5am UTC)
+  workflow_dispatch:
 
 jobs:
   check:
