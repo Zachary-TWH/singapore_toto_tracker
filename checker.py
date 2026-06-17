@@ -26,11 +26,23 @@ def get_jackpot():
     try:
         driver.get("https://www.singaporepools.com.sg/en/product/pages/toto_results.aspx")
         wait = WebDriverWait(driver, 20)
-        # Wait for jackpot amount to appear
-        element = wait.until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".jackpot-amount, .jackpotAmt, [class*='jackpot']"))
+        wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+
+        # Dump all text containing dollar amounts to find the right element
+        elements = driver.find_elements(By.XPATH, "//*[contains(text(), '$') and contains(text(), ',000')]")
+        for el in elements:
+            print("FOUND:", repr(el.text), "| class:", el.get_attribute("class"))
+
+        # Find the one that says "Next Jackpot" nearby
+        jackpot_label = wait.until(
+            EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Next Jackpot')]"))
         )
-        text = element.text.strip()
+        # Get the parent container, then find the dollar amount inside it
+        container = jackpot_label.find_element(By.XPATH, "./ancestor::*[3]")
+        amount_el = container.find_element(By.XPATH, ".//*[contains(text(), '$')]")
+        text = amount_el.text.strip()
+        print("Jackpot element text:", repr(text))
+
         cleaned = text.replace("$", "").replace(",", "").replace("est", "").strip()
         return int(cleaned), text
     finally:
