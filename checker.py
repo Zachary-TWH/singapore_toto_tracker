@@ -49,13 +49,13 @@ def send_email(jackpot_display):
 
 try:
     jackpot_value, jackpot_display = get_jackpot()
-    print(f"Jackpot: {jackpot_display} | Threshold: ${THRESHOLD:,}")
+    print(f"Jackpot: {jackpot_display}")
 
-    if jackpot_value >= THRESHOLD:
+    if 4_000_000 <= jackpot_value <= 5_000_000:
         send_email(jackpot_display)
         print("Alert sent.")
     else:
-        print("Below threshold. No alert sent.")
+        print(f"Jackpot {jackpot_display} outside $4M–$5M range. No alert sent.")
 
 except Exception as e:
     print(f"Error: {e}")
