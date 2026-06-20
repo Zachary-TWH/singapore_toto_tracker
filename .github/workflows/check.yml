@@ -25,4 +25,5 @@ jobs:
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+          RECIPIENTS: ${{ secrets.RECIPIENTS }}
         run: python checker.py
