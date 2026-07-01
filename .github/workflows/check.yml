@@ -18,8 +18,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get install -y chromium-browser
-          pip install selenium
+          pip install selenium playwright
+          playwright install chromium
 
       - name: Run checker
         env:
